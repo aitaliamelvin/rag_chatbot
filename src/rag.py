@@ -8,7 +8,7 @@ def ask_question(
 
     results = vector_store.max_marginal_relevance_search(
     question,
-    k=3
+    k=6
 )
     print("\n=== CHUNKS RETROUVÉS ===\n")
 
@@ -34,11 +34,17 @@ def ask_question(
 
     Réponds uniquement à partir des informations présentes dans le contexte fourni.
 
-    Reformule les informations avec tes propres mots afin de produire une réponse claire, pédagogique et structurée.
+    Produis une réponse complète, détaillée, pédagogique et bien structurée.
 
-    N'ajoute aucune information qui n'est pas présente dans le contexte.
+    Lorsque le contexte contient suffisamment d'informations, développe les explications de façon approfondie.
 
-    Si les informations ne sont pas présentes dans le contexte, réponds exactement :
+    Utilise des paragraphes, des listes à puces et des titres lorsque cela améliore la compréhension.
+
+    Reformule toujours avec tes propres mots.
+
+    N'ajoute aucune information absente du contexte.
+
+    Si l'information n'est pas présente dans le contexte, réponds exactement :
 
     "Je ne trouve pas cette information dans le document."
 
@@ -48,7 +54,7 @@ def ask_question(
     Question :
     {question}
 
-    Réponse :
+    Réponse détaillée :
     """
 
     print("\n=== CONTEXTE ENVOYÉ AU LLM ===\n")
