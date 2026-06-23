@@ -158,6 +158,14 @@ streamlit run streamlit_app.py
 
 ---
 
+## 🌐 Démonstration en ligne
+
+L'application est accessible à l'adresse suivante :
+
+https://rag-chatbot-melvin.streamlit.app/
+
+---
+
 ## 👨‍💻 Auteur
 
 Projet réalisé par **Melvin Ait-Alia** dans le cadre d'un apprentissage des systèmes RAG et des technologies d'IA générative.
