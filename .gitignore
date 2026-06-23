@@ -1,0 +1,19 @@
+# Environnement virtuel
+.venv/
+
+# Variables d'environnement
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Dossiers temporaires Streamlit
+.streamlit/
+
+# Base Chroma persistée (si tu ne souhaites pas la partager)
+data/chroma_db/
