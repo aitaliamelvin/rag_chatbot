@@ -1,5 +1,7 @@
 import streamlit as st
-import requests
+from src.ingest import load_and_split_pdf
+from src.vector_store import create_vector_store
+from src.rag import ask_question
 import os
 import time
 
@@ -74,58 +76,70 @@ pdf_files = [
 if pdf_files:
     with st.sidebar:
 
-       if pdf_files:
+        if pdf_files:
 
-        st.success(
-            f"{len(pdf_files)} PDF disponible(s)"
-        )
-
-        selected_pdf = st.selectbox(
-            "Choisissez le PDF à utiliser",
-            pdf_files
-        )
-
-        if st.button(
-            "🗑️ Supprimer le PDF sélectionné"
-        ):
-
-            file_path = os.path.join(
-                pdf_directory,
-                selected_pdf
+            st.success(
+                f"{len(pdf_files)} PDF disponible(s)"
             )
 
-            os.remove(file_path)
-
-            st.session_state["toast_message"] = (
-                f"🗑️ {selected_pdf} supprimé avec succès."
+            selected_pdf = st.selectbox(
+                "Choisissez le PDF à utiliser",
+                pdf_files
             )
+ 
+            if "last_pdf" not in st.session_state:
+                st.session_state.last_pdf = selected_pdf
 
-            st.rerun()
+            if st.session_state.last_pdf != selected_pdf:
+                st.session_state.messages = []
+                st.session_state.last_pdf = selected_pdf
 
-        if st.button(
-            "🧹 Effacer la conversation"
-        ):
+            if st.button(
+                "🗑️ Supprimer le PDF sélectionné"
+            ):
+
+                file_path = os.path.join(
+                    pdf_directory,
+                    selected_pdf
+                )
+
+                os.remove(file_path)
+
+                st.session_state["toast_message"] = (
+                    f"🗑️ {selected_pdf} supprimé avec succès."
+                )
+
+                st.rerun()
+
+            if st.button(
+                "🧹 Effacer la conversation"
+            ):
+
+                st.session_state.messages = []
+
+                st.session_state["toast_message"] = (
+                    "🧹 Conversation réinitialisée."
+                )
+
+                st.rerun()
+
+        else:
+
+            st.info(
+                "Aucun PDF disponible."
+            )
 
             st.session_state.messages = []
-
-            st.session_state["toast_message"] = (
-                "🧹 Conversation réinitialisée."
-            )
-
-            st.rerun()
-
-if "last_pdf" not in st.session_state:
-        st.session_state.last_pdf = selected_pdf
-
-if st.session_state.last_pdf != selected_pdf:
-    st.session_state.messages = []
-    st.session_state.last_pdf = selected_pdf
+            st.session_state.last_pdf = None
 
 for message in st.session_state.messages:
 
     with st.chat_message(message["role"]):
 
         st.markdown(message["content"])
+
+if not pdf_files:
+    st.stop()
 
 question = st.chat_input(
     "Posez votre question"
@@ -154,17 +168,26 @@ if question:
         "🔍 Analyse du document en cours..."
     ):
 
-        response = requests.post(
-            "http://127.0.0.1:8000/ask",
-            json={
-                "question": question,
-                "pdf_name": selected_pdf
-            }
+        pdf_path = os.path.join(
+            pdf_directory,
+            selected_pdf
         )
 
-    answer = response.json()["answer"]
-    
-    sources = response.json()["sources"]
+        chunks = load_and_split_pdf(
+            pdf_path
+        )
+
+        vector_store = create_vector_store(
+            chunks
+        )
+
+        result = ask_question(
+            question,
+            vector_store
+        )
+
+        answer = result["answer"]
+        sources = result["sources"]
 
     st.session_state.messages.append(
         {

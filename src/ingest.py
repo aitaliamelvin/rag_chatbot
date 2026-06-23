@@ -2,10 +2,9 @@ from langchain_community.document_loaders import (
     PyPDFLoader
 )
 
-from langchain.text_splitter import (
+from langchain_text_splitters import (
     RecursiveCharacterTextSplitter
 )
-
 
 def load_and_split_pdf(pdf_path):
 
